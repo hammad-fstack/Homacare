@@ -1,5 +1,3 @@
-import DoctorSelection from './pages/DoctorSelection';
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/common/Layout';
 import Dashboard from './pages/Dashboard';
@@ -7,8 +5,8 @@ import Consultations from './pages/Consultations';
 import LabTests from './pages/LabTests';
 import Profile from './pages/Profile';
 import Appointments from './pages/Appointments';
-
-// Routes mein add karo:
+import DoctorSelection from './pages/DoctorSelection';
+import AppointmentBooking from './pages/AppointmentBooking';
 
 function App() {
   return (
@@ -21,6 +19,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/book-appointment" element={<DoctorSelection />} />
+          <Route path="/book-appointment/:doctorId" element={<AppointmentBooking />} />
         </Routes>
       </Layout>
     </BrowserRouter>

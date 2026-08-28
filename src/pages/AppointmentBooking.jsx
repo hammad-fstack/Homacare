@@ -4,13 +4,14 @@ import { useBookingFlow, BOOKING_STEPS } from '../hooks/useBookingFlow';
 import AssignedSpecialist from '../components/appointment/AssignedSpecialist';
 import ScheduleSelector from '../components/appointment/ScheduleSelector';
 import PaymentForm from '../components/appointment/PaymentForm';
+import ConfirmationModal from '../components/appointment/ConfirmationModal';
 import WaitingScreen from '../components/appointment/WaitingScreen';
 
 const AppointmentBooking = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
   const doctor = DOCTORS.find((d) => d.id === Number(doctorId));
-  const { step, goToPayment, goToWaiting } = useBookingFlow();
+  const { step, goToPayment, goToConfirmation, goToWaiting } = useBookingFlow();
 
   if (!doctor) return <div className="p-6 text-sm text-gray-400">Doctor not found</div>;
 
@@ -37,13 +38,17 @@ const AppointmentBooking = () => {
             <>
               <h3 className="font-bold text-gray-900 mb-1">Confirm Your Doctor Consultation</h3>
               <p className="text-xs text-gray-400 mb-4">Enter your payment to schedule your consultation</p>
-              <PaymentForm onPay={goToWaiting} />
+              <PaymentForm onPay={goToConfirmation} />
             </>
           )}
 
           {step === BOOKING_STEPS.WAITING && <WaitingScreen />}
         </div>
       </div>
+
+      {step === BOOKING_STEPS.CONFIRMATION && (
+        <ConfirmationModal doctorName={doctor.name} onOkay={goToWaiting} />
+      )}
     </div>
   );
 };
