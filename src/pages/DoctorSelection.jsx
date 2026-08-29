@@ -1,21 +1,28 @@
 import { useNavigate } from 'react-router-dom';
-import { DOCTORS } from '../config/doctorsConfig';
+import { useDoctors } from '../hooks/useDoctors';
 import { useDoctorSelection } from '../hooks/useDoctorSelection';
 import AssignedSpecialist from '../components/appointment/AssignedSpecialist';
 import DoctorGridCard from '../components/appointment/DoctorGridCard';
+import PageHeader from '../components/common/PageHeader';
 
 const DoctorSelection = () => {
   const navigate = useNavigate();
-  const { selectedDoctorId, selectDoctor } = useDoctorSelection(DOCTORS[0].id);
+  const { doctors, loading } = useDoctors();
+  const { selectedDoctorId, selectDoctor } = useDoctorSelection(null);
 
-  const assignedDoctor = DOCTORS.find((d) => d.id === selectedDoctorId);
+  if (loading) return <div className="p-6 text-sm text-gray-400">Loading doctors...</div>;
+
+  const currentId = selectedDoctorId ?? doctors[0]?.id;
+  const assignedDoctor = doctors.find((d) => d.id === currentId);
 
   const handleProceed = () => {
-    navigate(`/book-appointment/${selectedDoctorId}`);
+    navigate(`/book-appointment/${currentId}`);
   };
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Appointment" />
+
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Your Assigned Specialist</h2>
         <p className="text-xs text-gray-400 mt-1">Book your consultation with ease</p>
@@ -27,15 +34,15 @@ const DoctorSelection = () => {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-bold text-gray-900 mb-1">Prefer a different doctor?</h3>
           <p className="text-xs text-gray-400 mb-4">
-            Browse other specialists from the same field and pick the one that best suits your preference.
+            Browse other specialists from around the world and pick the one that best suits your preference.
           </p>
 
           <div className="grid grid-cols-3 gap-3">
-            {DOCTORS.map((doc) => (
+            {doctors.map((doc) => (
               <DoctorGridCard
                 key={doc.id}
                 doctor={doc}
-                isSelected={selectedDoctorId === doc.id}
+                isSelected={currentId === doc.id}
                 onSelect={selectDoctor}
               />
             ))}

@@ -1,0 +1,160 @@
+[
+    {
+        "id": 1,
+        "name": "Dr. Sara Al-Mutairi",
+        "specialty": "Fertility doctor",
+        "experience": "10+ Years Experience",
+        "bio": "Dr. Sara Al-Mutairi is a fertility specialist with 10 years of experience helping couples achieve their family goals.",
+        "avatar": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "Saudi Arabia",
+        "currencyCode": "SAR",
+        "currencySymbol": "SAR",
+        "ratePerMinute": 4,
+        "workingHours": {
+            "start": "09:00",
+            "end": "17:00"
+        },
+        "offDays": [
+            "Sun"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Dr. Mariam Al-Saadi",
+        "specialty": "Reproductive Medicine",
+        "experience": "8+ Years Experience",
+        "bio": "Dr. Mariam Al-Saadi specializes in reproductive health and hormone therapy for couples.",
+        "avatar": "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "United Arab Emirates",
+        "currencyCode": "AED",
+        "currencySymbol": "AED",
+        "ratePerMinute": 3.5,
+        "workingHours": {
+            "start": "10:00",
+            "end": "18:00"
+        },
+        "offDays": [
+            "Wed",
+            "Sun"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Dr. Hassan",
+        "specialty": "NeuroLogisst",
+        "experience": "12+ Years Experience",
+        "bio": "Experienced neurologist specializing in the diagnosis and treatment of brain, nerve, and nervous system disorders.",
+        "avatar": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "Egypt",
+        "currencyCode": "EGP",
+        "currencySymbol": "EGP",
+        "ratePerMinute": 25,
+        "workingHours": {
+            "start": "09:00",
+            "end": "16:00"
+        },
+        "offDays": [
+            "Sat",
+            "Sun"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Dr. Khalid",
+        "specialty": "Fertility doctor",
+        "experience": "6+ Years Experience",
+        "bio": "Dr. Amina Khalid helps couples navigate fertility treatment with personalized care plans.",
+        "avatar": "https://images.unsplash.com/photo-1666887360742-974c8fce8e6b?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "Pakistan",
+        "currencyCode": "PKR",
+        "currencySymbol": "Rs",
+        "ratePerMinute": 100,
+        "workingHours": {
+            "start": "11:00",
+            "end": "19:00"
+        },
+        "offDays": [
+            "Mon",
+            "Fri"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Dr. Noor",
+        "specialty": "Reproductive Medicine",
+        "experience": "9+ Years Experience",
+        "bio": "Dr. Fatima Noor is dedicated to hormone therapy and reproductive wellness.",
+        "avatar": "https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "Turkey",
+        "currencyCode": "TRY",
+        "currencySymbol": "TRY",
+        "ratePerMinute": 8,
+        "workingHours": {
+            "start": "08:00",
+            "end": "15:00"
+        },
+        "offDays": [
+            "Thu"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Dr. Raza",
+        "specialty": "Gynecologist",
+        "experience": "7+ Years Experience",
+        "bio": "Dr. Hina Raza provides comprehensive womens health and preventive checkups.",
+        "avatar": "https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "India",
+        "currencyCode": "INR",
+        "currencySymbol": "Rs",
+        "ratePerMinute": 60,
+        "workingHours": {
+            "start": "09:30",
+            "end": "17:30"
+        },
+        "offDays": [
+            "Tue",
+            "Sun"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Dr. Carter",
+        "specialty": "Fertility doctor",
+        "experience": "11+ Years Experience",
+        "bio": "Dr. Carter is a board-certified fertility expert with over a decade of clinical experience.",
+        "avatar": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "United States",
+        "currencyCode": "USD",
+        "currencySymbol": "$",
+        "ratePerMinute": 1,
+        "workingHours": {
+            "start": "09:00",
+            "end": "17:00"
+        },
+        "offDays": [
+            "Sat",
+            "Sun"
+        ]
+    },
+    {
+        "id": 8,
+        "name": "Dr. Ahmad Mansoor",
+        "specialty": "Reproductive Medicine",
+        "experience": "5+ Years Experience",
+        "bio": "Dr. Ahmad Mansoor focuses on male and female fertility diagnostics and treatment planning.",
+        "avatar": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=600&h=800",
+        "country": "United Kingdom",
+        "currencyCode": "GBP",
+        "currencySymbol": "£",
+        "ratePerMinute": 0.8,
+        "workingHours": {
+            "start": "08:30",
+            "end": "16:30"
+        },
+        "offDays": [
+            "Sat",
+            "Sun"
+        ]
+    }
+]

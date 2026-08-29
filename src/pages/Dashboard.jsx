@@ -1,3 +1,4 @@
+import PageHeader from '../components/common/PageHeader';
 import { Search, Bell } from 'lucide-react';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { METRIC_CARDS, EMPTY_STATE_CONFIG } from '../config/dashboardConfig';
@@ -15,6 +16,7 @@ const Dashboard = () => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
+                <PageHeader title="Dashboard" />
                 <h1 className="text-2xl font-bold text-gray-900">Hello {data.userName} !</h1>
 
                 <div className="flex items-center gap-3">

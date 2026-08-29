@@ -1,22 +1,28 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { DOCTORS } from '../config/doctorsConfig';
+import { useDoctors } from '../hooks/useDoctors';
 import { useBookingFlow, BOOKING_STEPS } from '../hooks/useBookingFlow';
 import AssignedSpecialist from '../components/appointment/AssignedSpecialist';
 import ScheduleSelector from '../components/appointment/ScheduleSelector';
 import PaymentForm from '../components/appointment/PaymentForm';
 import ConfirmationModal from '../components/appointment/ConfirmationModal';
 import WaitingScreen from '../components/appointment/WaitingScreen';
+import PageHeader from '../components/common/PageHeader';
 
 const AppointmentBooking = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
-  const doctor = DOCTORS.find((d) => d.id === Number(doctorId));
+  const { doctors, loading } = useDoctors();
   const { step, goToPayment, goToConfirmation, goToWaiting } = useBookingFlow();
 
+  if (loading) return <div className="p-6 text-sm text-gray-400">Loading...</div>;
+
+  const doctor = doctors.find((d) => d.id === Number(doctorId));
   if (!doctor) return <div className="p-6 text-sm text-gray-400">Doctor not found</div>;
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Appointment" />
+
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Your Assigned Specialist</h2>
         <p className="text-xs text-gray-400 mt-1">Book your consultation with ease</p>
@@ -28,6 +34,7 @@ const AppointmentBooking = () => {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           {step === BOOKING_STEPS.SCHEDULE && (
             <ScheduleSelector
+              doctor={doctor}
               onContinue={goToPayment}
               onRetakeSurvey={() => navigate('/survey')}
               onChooseAnotherDoctor={() => navigate('/book-appointment')}

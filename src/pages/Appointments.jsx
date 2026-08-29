@@ -1,3 +1,4 @@
+import PageHeader from '../components/common/PageHeader';
 import { useNavigate } from 'react-router-dom';
 import { useAppointments } from '../hooks/useAppointments';
 import EmptyState from '../components/common/EmptyState';
@@ -11,6 +12,7 @@ const Appointments = () => {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Appointment" />
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Take charge of your wellness</h2>
         <p className="text-xs text-gray-400 mt-1">
@@ -26,7 +28,7 @@ const Appointments = () => {
         </div>
       ) : (
         <EmptyState
-          icon="📅"
+          icon="🗓️"
           message="No appointments yet"
           actionLabel="Book a consultation"
           onAction={() => navigate('/book-appointment')}

@@ -1,3 +1,4 @@
+import PageHeader from '../components/common/PageHeader';
 import { ChevronRight } from 'lucide-react';
 import { useLabTests } from '../hooks/useLabTests';
 import EmptyState from '../components/common/EmptyState';
@@ -9,6 +10,7 @@ const LabTests = () => {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Lab Tests" />
       <h1 className="text-2xl font-bold text-gray-900">Lab Tests</h1>
 
       <div className="space-y-3">

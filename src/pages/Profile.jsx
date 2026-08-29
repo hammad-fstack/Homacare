@@ -1,3 +1,4 @@
+import PageHeader from '../components/common/PageHeader';
 import { useProfile } from '../hooks/useProfile';
 import ProfileField from '../components/profile/ProfileField';
 
@@ -15,6 +16,7 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Profile" />
       <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 max-w-md">
