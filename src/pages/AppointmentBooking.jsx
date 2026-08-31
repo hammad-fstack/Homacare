@@ -16,7 +16,7 @@ const AppointmentBooking = () => {
 
   if (loading) return <div className="p-6 text-sm text-gray-400">Loading...</div>;
 
-  const doctor = doctors.find((d) => d.id === Number(doctorId));
+const doctor = doctors.find((d) => String(d.id) === String(doctorId));
   if (!doctor) return <div className="p-6 text-sm text-gray-400">Doctor not found</div>;
 
   return (

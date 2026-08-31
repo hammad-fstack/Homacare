@@ -4,6 +4,9 @@ import { WEEK_DAYS, SESSION_DURATIONS } from '../../config/appointmentConfig';
 import { useDoctorSchedule } from '../../hooks/useDoctorSchedule';
 import { calculatePrice } from '../../utils/scheduleUtils';
 
+const MONTH_LABEL = 'September';
+const YEAR_LABEL = '2025';
+
 const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherDoctor }) => {
   const [selectedDay, setSelectedDay] = useState(WEEK_DAYS[0]);
   const [duration, setDuration] = useState(SESSION_DURATIONS[0]);
@@ -21,6 +24,9 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
 
   const isDayOff = schedule.offDays.includes(selectedDay.label);
   const daySlots = schedule.slotsByDay[selectedDay.label] || [];
+
+  // Selected din ke hisaab se poori date banata hai - jaise "September 01, 2025"
+  const fullDateLabel = `${MONTH_LABEL} ${selectedDay.date}, ${YEAR_LABEL}`;
 
   const handleDaySelect = (day) => {
     setSelectedDay(day);
@@ -41,14 +47,14 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
       <div>
         <h3 className="font-bold text-gray-900 text-xl mb-1.5">Schedule Your Consultation</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
-          Select a day and time that best fits your schedule. Your session will be private and secure.
+          Select a day and time that best fits your schedule. Your session will be private, secure, and last about {duration} minutes.
         </p>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg px-3 py-2">
           <Calendar className="w-4 h-4 text-gray-400" />
-          September 2025
+          {fullDateLabel}
         </div>
         <div className="flex gap-2">
           <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">
@@ -86,7 +92,7 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
           {SESSION_DURATIONS.map(function (d) {
             const durationPrice = calculatePrice(doctor, d);
             const active = duration === d;
-            let btnClass = 'text-xs py-2.5 rounded-xl font-medium transition-colors flex flex-col items-center ';
+            let btnClass = 'text-xs py-2.5 rounded-xl font-medium transition-colors ';
             if (active) {
               btnClass += 'bg-emerald-50 text-emerald-600 border border-emerald-300';
             } else {
@@ -94,8 +100,7 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
             }
             return (
               <button key={d} onClick={function () { setDuration(d); }} className={btnClass}>
-                <span>{d} min</span>
-                <span className="text-[10px] opacity-75">{durationPrice.formatted}</span>
+                {d} min / {durationPrice.formatted}
               </button>
             );
           })}
@@ -115,19 +120,26 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
           <p className="text-xs text-gray-400 italic">No slots available.</p>
         )}
 
-        {!loading && !isDayOff && daySlots.length > 0 && (
-          <div className="grid grid-cols-3 gap-2">
+               {!loading && !isDayOff && daySlots.length > 0 && (
+          <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto pr-1">
             {daySlots.map(function (slot) {
-              const active = time === slot;
+              const active = time === slot.label;
               let btnClass = 'text-[11px] py-2.5 rounded-xl font-medium transition-colors ';
-              if (active) {
+              if (slot.isBooked) {
+                btnClass += 'bg-gray-50 text-gray-300 line-through cursor-not-allowed';
+              } else if (active) {
                 btnClass += 'bg-emerald-50 text-emerald-600 border border-emerald-300';
               } else {
                 btnClass += 'bg-gray-50 text-gray-600 hover:bg-gray-100';
               }
               return (
-                <button key={slot} onClick={function () { setTime(slot); }} className={btnClass}>
-                  {slot}
+                <button
+                  key={slot.label}
+                  disabled={slot.isBooked}
+                  onClick={function () { setTime(slot.label); }}
+                  className={btnClass}
+                >
+                  {slot.label}
                 </button>
               );
             })}
@@ -139,7 +151,7 @@ const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherD
 
       <div className="flex gap-2 pt-2">
         <button onClick={handleContinue} className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors">
-          Accept and Continue
+          Accept & Continue
         </button>
         <button onClick={onRetakeSurvey} className="bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
           Retake Survey
