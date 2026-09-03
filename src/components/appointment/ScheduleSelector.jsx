@@ -1,163 +1,119 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { WEEK_DAYS, SESSION_DURATIONS } from '../../config/appointmentConfig';
-import { useDoctorSchedule } from '../../hooks/useDoctorSchedule';
-import { calculatePrice } from '../../utils/scheduleUtils';
+import { useState } from 'react';
 
-const MONTH_LABEL = 'September';
-const YEAR_LABEL = '2025';
+const DURATIONS = [
+  { min: 15, price: 150 },
+  { min: 30, price: 300 },
+  { min: 45, price: 450 },
+  { min: 60, price: 600 },
+];
 
-const ScheduleSelector = ({ doctor, onContinue, onRetakeSurvey, onChooseAnotherDoctor }) => {
-  const [selectedDay, setSelectedDay] = useState(WEEK_DAYS[0]);
-  const [duration, setDuration] = useState(SESSION_DURATIONS[0]);
+const TIME_SLOTS = ['12:30','12:45','13:00','13:15','13:30','13:45','14:00','14:15','14:30','14:45','15:00','15:15','15:30','15:45','16:00','16:15','16:30','16:45','17:00','17:15','17:30','17:45','18:00','18:15','18:30','18:45','19:00','19:15','19:30','19:45'];
+
+const getWeekDays = (start) => {
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    days.push(d);
+  }
+  return days;
+};
+
+const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const ScheduleSelector = ({ onContinue }) => {
+  const [weekStart, setWeekStart] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [duration, setDuration] = useState(15);
   const [time, setTime] = useState(null);
   const [error, setError] = useState('');
 
-  const scheduleData = useDoctorSchedule(doctor.id, duration);
-  const schedule = scheduleData.schedule;
-  const loading = scheduleData.loading;
-  const price = calculatePrice(doctor, duration);
+  const weekDays = getWeekDays(weekStart);
 
-  useEffect(() => {
-    setTime(null);
-  }, [duration]);
-
-  const isDayOff = schedule.offDays.includes(selectedDay.label);
-  const daySlots = schedule.slotsByDay[selectedDay.label] || [];
-
-  // Selected din ke hisaab se poori date banata hai - jaise "September 01, 2025"
-  const fullDateLabel = `${MONTH_LABEL} ${selectedDay.date}, ${YEAR_LABEL}`;
-
-  const handleDaySelect = (day) => {
-    setSelectedDay(day);
-    setTime(null);
+  const shiftWeek = (dir) => {
+    const newStart = new Date(weekStart);
+    newStart.setDate(weekStart.getDate() + dir * 7);
+    setWeekStart(newStart);
   };
 
   const handleContinue = () => {
     if (!time) {
-      setError('Please select a time slot first');
+      setError('Pehle ek time slot select karein');
       return;
     }
     setError('');
-    onContinue({ day: selectedDay.label, date: selectedDay.date, duration: duration, time: time, price: price.formatted });
+    const [h, m] = time.split(':');
+    const fullDate = selectedDate.toISOString().split('T')[0];
+    onContinue({ date: selectedDate.getDate(), fullDate, time24: `${h}:${m}`, time, duration });
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="font-bold text-gray-900 text-xl mb-1.5">Schedule Your Consultation</h3>
-        <p className="text-sm text-gray-500 leading-relaxed">
-          Select a day and time that best fits your schedule. Your session will be private, secure, and last about {duration} minutes.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg px-3 py-2">
-          <Calendar className="w-4 h-4 text-gray-400" />
-          {fullDateLabel}
-        </div>
+    <div className="space-y-5">
+      <div className="flex justify-between items-center">
+        <span className="text-sm font-semibold text-gray-800 bg-gray-50 px-3 py-1.5 rounded-lg">
+          {weekStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </span>
         <div className="flex gap-2">
-          <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">
-            <ChevronLeft className="w-4 h-4 text-gray-500" />
-          </button>
-          <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50">
-            <ChevronRight className="w-4 h-4 text-gray-500" />
-          </button>
+          <button onClick={() => shiftWeek(-1)} className="text-gray-400 hover:text-gray-700">&lt;</button>
+          <button onClick={() => shiftWeek(1)} className="text-gray-400 hover:text-gray-700">&gt;</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
-        {WEEK_DAYS.map(function (d) {
-          const off = schedule.offDays.includes(d.label);
-          let btnClass = 'text-xs py-2.5 rounded-xl font-medium transition-colors ';
-          if (off) {
-            btnClass += 'bg-gray-50 text-gray-300 cursor-not-allowed';
-          } else if (selectedDay.date === d.date) {
-            btnClass += 'bg-indigo-500 text-white ring-2 ring-indigo-200';
-          } else {
-            btnClass += 'bg-gray-50 text-gray-600 hover:bg-gray-100';
-          }
+      <div className="grid grid-cols-7 gap-1.5">
+        {weekDays.map((d) => {
+          const isSelected = d.toDateString() === selectedDate.toDateString();
           return (
-            <button key={d.date} disabled={off} onClick={function () { handleDaySelect(d); }} className={btnClass}>
-              <span className="block">{d.label}</span>
-              <span className="block font-semibold">{d.date}</span>
+            <button
+              key={d.toISOString()}
+              onClick={() => setSelectedDate(d)}
+              className={`text-[11px] py-2 rounded-lg font-medium ${isSelected ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-600'}`}
+            >
+              <span className="block">{DAY_LABELS[d.getDay()]}</span>
+              <span className="block">{String(d.getDate()).padStart(2, '0')}</span>
             </button>
           );
         })}
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-gray-800 mb-2.5">Session Duration</p>
-        <div className="grid grid-cols-4 gap-2">
-          {SESSION_DURATIONS.map(function (d) {
-            const durationPrice = calculatePrice(doctor, d);
-            const active = duration === d;
-            let btnClass = 'text-xs py-2.5 rounded-xl font-medium transition-colors ';
-            if (active) {
-              btnClass += 'bg-emerald-50 text-emerald-600 border border-emerald-300';
-            } else {
-              btnClass += 'bg-gray-50 text-gray-600 hover:bg-gray-100';
-            }
-            return (
-              <button key={d} onClick={function () { setDuration(d); }} className={btnClass}>
-                {d} min / {durationPrice.formatted}
-              </button>
-            );
-          })}
+        <p className="text-sm font-semibold text-gray-800 mb-2">Session Duration</p>
+        <div className="flex gap-2 flex-wrap">
+          {DURATIONS.map((d) => (
+            <button
+              key={d.min}
+              onClick={() => setDuration(d.min)}
+              className={`text-xs px-4 py-1.5 rounded-lg font-medium flex flex-col items-center ${
+                duration === d.min ? 'bg-emerald-50 text-emerald-600 border border-emerald-400' : 'bg-gray-50 text-gray-600'
+              }`}
+            >
+              <span>{d.min} min</span>
+              <span className="text-[10px]">{d.price} SAR</span>
+            </button>
+          ))}
         </div>
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-gray-800 mb-2.5">Session Time</p>
-
-        {loading && <p className="text-xs text-gray-400">Loading slots...</p>}
-
-        {!loading && isDayOff && (
-          <p className="text-xs text-gray-400 italic">Doctor is off on this day. Please choose another day.</p>
-        )}
-
-        {!loading && !isDayOff && daySlots.length === 0 && (
-          <p className="text-xs text-gray-400 italic">No slots available.</p>
-        )}
-
-               {!loading && !isDayOff && daySlots.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto pr-1">
-            {daySlots.map(function (slot) {
-              const active = time === slot.label;
-              let btnClass = 'text-[11px] py-2.5 rounded-xl font-medium transition-colors ';
-              if (slot.isBooked) {
-                btnClass += 'bg-gray-50 text-gray-300 line-through cursor-not-allowed';
-              } else if (active) {
-                btnClass += 'bg-emerald-50 text-emerald-600 border border-emerald-300';
-              } else {
-                btnClass += 'bg-gray-50 text-gray-600 hover:bg-gray-100';
-              }
-              return (
-                <button
-                  key={slot.label}
-                  disabled={slot.isBooked}
-                  onClick={function () { setTime(slot.label); }}
-                  className={btnClass}
-                >
-                  {slot.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
+        <p className="text-sm font-semibold text-gray-800 mb-2">Session Time</p>
+        <div className="grid grid-cols-4 gap-2">
+          {TIME_SLOTS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTime(t)}
+              className={`text-[11px] py-2 rounded-lg font-medium ${time === t ? 'bg-emerald-500 text-white' : 'bg-gray-50 text-gray-600'}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
-      <div className="flex gap-2 pt-2">
-        <button onClick={handleContinue} className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors">
-          Accept & Continue
-        </button>
-        <button onClick={onRetakeSurvey} className="bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-          Retake Survey
-        </button>
-        <button onClick={onChooseAnotherDoctor} className="bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-          Choose another doctor
+      <div className="flex gap-3">
+        <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg">Retake Survey</button>
+        <button onClick={handleContinue} className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-6 py-2.5 rounded-lg">
+          Accept &amp; Continue
         </button>
       </div>
     </div>

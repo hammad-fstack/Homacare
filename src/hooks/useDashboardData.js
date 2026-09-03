@@ -7,34 +7,40 @@ export const useDashboardData = (userId) => {
   useEffect(() => {
     const fetchDashboard = async () => {
       setLoading(true);
-      try {
-        const mockData = {
-          userName: 'Ahmed',
-          consultations: { count: 2 },
-          labTests: {
-            count: 3,
-            items: [
-              { id: 1, doctor: 'Dr. Layla Hassan', title: 'Fertility & Hormone Panel', time: '12h ago' },
-            ],
-          },
-          prescriptions: { count: 2 },
-          upcomingConsultation: {
-            doctor: 'Dr. Lina Hassan',
-            title: 'Fertility & Hormone Check',
-            avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150',
-          },
-activity: [
-  { date: '11 Sep', title: 'Appointment Confirmed', type: 'appointment' },
-  { date: '10 Sep', title: 'Your consultation starts tomorrow', type: 'consultation' },
-  { date: '09 Sep', title: 'Your lab results are ready', type: 'lab' },
-  { date: '08 Sep', title: 'Platform maintenance scheduled', type: 'maintenance' },
-  { date: '07 Sep', title: 'New message from your doctor', type: 'message' },
-],
-        };
-        setData(mockData);
-      } finally {
-        setLoading(false);
-      }
+      const mockData = {
+        userName: 'Ahmed',
+        notificationCount: 9,
+        consultations: { count: 31 },
+        labTests: {
+          count: 4,
+          items: [
+            { id: 1, orderedBy: 'User', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'pay', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
+            { id: 2, orderedBy: 'Pakistan', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'addDetails', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
+            { id: 3, orderedBy: 'Pakistan', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'addDetails', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
+            { id: 4, orderedBy: 'User', title: 'Fertility Male Panel.', time: '24d ago', status: 'track', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
+            { id: 5, orderedBy: 'dr rahim.', title: 'Hormonal Balance Panel.', time: '75d ago', status: 'view', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
+          ],
+        },
+        prescriptions: { count: 0 },
+        upcomingConsultation: {
+          doctor: 'UAT Doctor',
+          title: 'Balance your hormones',
+          date: '09/01/26',
+          status: 'Confirmed',
+          avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=150',
+        },
+        activity: [
+          { date: '', title: 'Your appointment with UAT...', type: 'appointment' },
+          { date: '', title: 'You have received a new message...', type: 'message' },
+          { date: '', title: 'You have received a new message...', type: 'message' },
+          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
+          { date: '', title: 'You have received a new message...', type: 'message' },
+          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
+          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
+        ],
+      };
+      setData(mockData);
+      setLoading(false);
     };
     fetchDashboard();
   }, [userId]);

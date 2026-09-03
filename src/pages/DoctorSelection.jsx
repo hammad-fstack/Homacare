@@ -1,22 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 import { useDoctors } from '../hooks/useDoctors';
 import { useDoctorSelection } from '../hooks/useDoctorSelection';
+import { useDoctorContext } from '../context/DoctorContext';
 import AssignedSpecialist from '../components/appointment/AssignedSpecialist';
 import DoctorGridCard from '../components/appointment/DoctorGridCard';
 import PageHeader from '../components/common/PageHeader';
 
 const DoctorSelection = () => {
   const navigate = useNavigate();
-  const { doctors, loading } = useDoctors();
+  const { doctors, loading, error } = useDoctors();
   const { selectedDoctorId, selectDoctor } = useDoctorSelection(null);
+  const { setSelectedDoctor } = useDoctorContext();
 
   if (loading) return <div className="p-6 text-sm text-gray-400">Loading doctors...</div>;
+  if (error) return <div className="p-6 text-sm text-red-500">Could not load doctors: {error}</div>;
+  if (!doctors.length) return <div className="p-6 text-sm text-gray-400">No doctors available</div>;
 
   const currentId = selectedDoctorId ?? doctors[0]?.id;
   const assignedDoctor = doctors.find((d) => d.id === currentId);
 
+  // Symptom questionnaire abhi bhi doctor ki specialty ke hisaab se sahi sawal chunta hai
   const handleProceed = () => {
-    navigate(`/book-appointment/${currentId}`);
+    setSelectedDoctor(assignedDoctor);
+    navigate('/symptom-check');
   };
 
   return (

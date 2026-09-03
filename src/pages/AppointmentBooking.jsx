@@ -1,61 +1,86 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDoctors } from '../hooks/useDoctors';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useDoctorById } from '../hooks/useDoctors';
 import { useBookingFlow, BOOKING_STEPS } from '../hooks/useBookingFlow';
-import AssignedSpecialist from '../components/appointment/AssignedSpecialist';
 import ScheduleSelector from '../components/appointment/ScheduleSelector';
+import OrderSummary from '../components/appointment/OrderSummary';
 import PaymentForm from '../components/appointment/PaymentForm';
-import ConfirmationModal from '../components/appointment/ConfirmationModal';
 import WaitingScreen from '../components/appointment/WaitingScreen';
-import PageHeader from '../components/common/PageHeader';
 
 const AppointmentBooking = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
-  const { doctors, loading } = useDoctors();
-  const { step, goToPayment, goToConfirmation, goToWaiting } = useBookingFlow();
+  const { doctor, loading, error } = useDoctorById(doctorId);
+  const { step, bookingDetails, goToOrderSummary, goToPayment, goBackToSchedule, goToWaiting } = useBookingFlow();
 
-  if (loading) return <div className="p-6 text-sm text-gray-400">Loading...</div>;
+  if (loading) return <div className="p-6 text-sm text-gray-400">Loading doctor...</div>;
 
-const doctor = doctors.find((d) => String(d.id) === String(doctorId));
-  if (!doctor) return <div className="p-6 text-sm text-gray-400">Doctor not found</div>;
+  if (error || !doctor) {
+    return (
+      <div className="p-6 text-center space-y-3">
+        <p className="text-sm text-gray-400">Doctor not found</p>
+        <button onClick={() => navigate('/doctor-portal')} className="text-emerald-600 text-sm font-medium underline">
+          Available doctors dekhein
+        </button>
+      </div>
+    );
+  }
+
+  // Yahan service ki jagah ab doctor ki consultation fee use hogi
+  const service = { title: `Consultation with ${doctor.name}`, price: doctor.consultationFee || 150 };
+
+  const appointmentDateTime = bookingDetails
+    ? `${bookingDetails.fullDate}T${bookingDetails.time24}:00`
+    : new Date(Date.now() + 6 * 3600000).toISOString();
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Appointment" />
-
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900">Your Assigned Specialist</h2>
-        <p className="text-xs text-gray-400 mt-1">Book your consultation with ease</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Your Assigned Specialist</h1>
+          <p className="text-xs text-gray-400">Book your consultation with Ease</p>
+        </div>
+        <button onClick={() => navigate('/doctor-portal')} className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-lg">
+          Choose another doctor
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AssignedSpecialist doctor={doctor} />
+        <div className="rounded-2xl overflow-hidden relative">
+          <img src={doctor.avatar} alt={doctor.name} className="w-full h-96 object-cover" style={{ objectPosition: 'center 20%' }} />
+          <div className="absolute top-4 left-4 flex gap-2">
+            <span className="text-[10px] bg-white/90 text-gray-700 px-2 py-1 rounded-full">{doctor.specialty}</span>
+            <span className="text-[10px] bg-white/90 text-gray-700 px-2 py-1 rounded-full">{doctor.experience}</span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <h3 className="text-white font-bold">{doctor.name}</h3>
+            <p className="text-white/80 text-xs mt-1">{doctor.bio}</p>
+          </div>
+        </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           {step === BOOKING_STEPS.SCHEDULE && (
-            <ScheduleSelector
-              doctor={doctor}
-              onContinue={goToPayment}
-              onRetakeSurvey={() => navigate('/survey')}
-              onChooseAnotherDoctor={() => navigate('/book-appointment')}
-            />
-          )}
-
-          {step === BOOKING_STEPS.PAYMENT && (
             <>
-              <h3 className="font-bold text-gray-900 mb-1">Confirm Your Doctor Consultation</h3>
-              <p className="text-xs text-gray-400 mb-4">Enter your payment to schedule your consultation</p>
-              <PaymentForm onPay={goToConfirmation} />
+              <h3 className="font-bold text-gray-900 mb-1">Schedule Your Consultation</h3>
+              <p className="text-xs text-gray-400 mb-4">
+                Select a day and time that best fits your schedule. Your session will be private, secure, and last about 60 minutes.
+              </p>
+              <ScheduleSelector onContinue={goToOrderSummary} />
             </>
           )}
 
-          {step === BOOKING_STEPS.WAITING && <WaitingScreen />}
+          {step === BOOKING_STEPS.ORDER_SUMMARY && (
+            <OrderSummary service={service} onConfirm={goToPayment} />
+          )}
+
+          {step === BOOKING_STEPS.PAYMENT && (
+            <PaymentForm onPay={goToWaiting} onChangeTime={goBackToSchedule} />
+          )}
+
+          {step === BOOKING_STEPS.WAITING && (
+            <WaitingScreen appointmentDateTime={appointmentDateTime} />
+          )}
         </div>
       </div>
-
-      {step === BOOKING_STEPS.CONFIRMATION && (
-        <ConfirmationModal doctorName={doctor.name} onOkay={goToWaiting} />
-      )}
     </div>
   );
 };
