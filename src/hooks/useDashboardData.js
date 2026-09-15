@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../config/backendApi';
 
 export const useDashboardData = (userId) => {
   const [data, setData] = useState(null);
@@ -7,40 +8,38 @@ export const useDashboardData = (userId) => {
   useEffect(() => {
     const fetchDashboard = async () => {
       setLoading(true);
-      const mockData = {
-        userName: 'Ahmed',
-        notificationCount: 9,
-        consultations: { count: 31 },
-        labTests: {
-          count: 4,
-          items: [
-            { id: 1, orderedBy: 'User', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'pay', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
-            { id: 2, orderedBy: 'Pakistan', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'addDetails', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
-            { id: 3, orderedBy: 'Pakistan', title: 'Hormonal Balance Panel.', time: '24d ago', status: 'addDetails', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
-            { id: 4, orderedBy: 'User', title: 'Fertility Male Panel.', time: '24d ago', status: 'track', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
-            { id: 5, orderedBy: 'dr rahim.', title: 'Hormonal Balance Panel.', time: '75d ago', status: 'view', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=100' },
-          ],
-        },
-        prescriptions: { count: 0 },
-        upcomingConsultation: {
-          doctor: 'UAT Doctor',
-          title: 'Balance your hormones',
-          date: '09/01/26',
-          status: 'Confirmed',
-          avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=150',
-        },
-        activity: [
-          { date: '', title: 'Your appointment with UAT...', type: 'appointment' },
-          { date: '', title: 'You have received a new message...', type: 'message' },
-          { date: '', title: 'You have received a new message...', type: 'message' },
-          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
-          { date: '', title: 'You have received a new message...', type: 'message' },
-          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
-          { date: '', title: 'Your appointment with Pakistan...', type: 'appointment' },
-        ],
-      };
-      setData(mockData);
-      setLoading(false);
+      try {
+        const res = await fetch(`${BACKEND_URL}/appointments/my`, { credentials: 'include' });
+        const result = await res.json();
+        const appointments = result.appointments || [];
+
+        const today = new Date().toISOString().split('T')[0];
+        const upcoming = appointments
+          .filter((a) => a.status === 'scheduled' && a.appointment_date.split('T')[0] >= today)
+          .sort((a, b) => a.appointment_date.localeCompare(b.appointment_date))[0];
+
+        setData({
+          userName: 'Ahmed',
+          notificationCount: appointments.filter((a) => a.status === 'scheduled').length,
+          consultations: { count: appointments.length },
+          labTests: { count: 0, items: [] },
+          prescriptions: { count: 0 },
+          upcomingConsultation: upcoming
+            ? {
+                doctor: upcoming.doctor_name,
+                title: upcoming.specialty || 'Consultation',
+                date: upcoming.appointment_date.split('T')[0],
+                status: 'Confirmed',
+                avatar: upcoming.doctor_avatar,
+              }
+            : null,
+          activity: [],
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchDashboard();
   }, [userId]);

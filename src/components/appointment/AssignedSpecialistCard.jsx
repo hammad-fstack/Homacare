@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { getDoctorAvatar } from '../../utils/doctorAvatarFallback';
 
 const AssignedSpecialistCard = ({ doctor }) => {
   const navigate = useNavigate();
@@ -9,7 +10,12 @@ const AssignedSpecialistCard = ({ doctor }) => {
   return (
     <div className="w-full space-y-3">
       <div className="rounded-2xl overflow-hidden relative aspect-[4/5]">
-        <img src={doctor.avatar} alt={doctor.name} className="w-full h-full object-cover" style={{ objectPosition: 'center 20%' }} />
+        <img
+          src={getDoctorAvatar(doctor)}
+          alt={doctor.name}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center 20%' }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
           <p className="text-white font-semibold text-sm">{doctor.name}</p>

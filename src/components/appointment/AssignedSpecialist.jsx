@@ -1,7 +1,9 @@
+import { getDoctorAvatar } from '../../utils/doctorAvatarFallback';
+
 const AssignedSpecialist = ({ doctor }) => (
   <div className="rounded-2xl overflow-hidden relative h-[560px] bg-gray-100">
     <img
-      src={doctor.avatar}
+      src={getDoctorAvatar(doctor)}
       alt={doctor.name}
       className="w-full h-full object-cover absolute inset-0"
       style={{ objectPosition: 'center 20%' }}

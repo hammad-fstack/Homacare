@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../config/backendApi';
 
-// Abhi mock — real data baad mein backend se aayegi
 export const useAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -8,9 +8,15 @@ export const useAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       setLoading(true);
-      // Empty array = "No appointments yet" screen dikhegi
-      setAppointments([]);
-      setLoading(false);
+      try {
+        const res = await fetch(`${BACKEND_URL}/appointments/my`, { credentials: 'include' });
+        const data = await res.json();
+        setAppointments(data.appointments || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchAppointments();
   }, []);

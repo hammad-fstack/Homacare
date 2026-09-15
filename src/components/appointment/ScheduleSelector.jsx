@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api';
 
 const DURATIONS = [
   { min: 15, price: 150 },
@@ -6,8 +7,6 @@ const DURATIONS = [
   { min: 45, price: 450 },
   { min: 60, price: 600 },
 ];
-
-const TIME_SLOTS = ['12:30','12:45','13:00','13:15','13:30','13:45','14:00','14:15','14:30','14:45','15:00','15:15','15:30','15:45','16:00','16:15','16:30','16:45','17:00','17:15','17:30','17:45','18:00','18:15','18:30','18:45','19:00','19:15','19:30','19:45'];
 
 const getWeekDays = (start) => {
   const days = [];
@@ -19,16 +18,41 @@ const getWeekDays = (start) => {
   return days;
 };
 
-const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const ScheduleSelector = ({ onContinue }) => {
+const ScheduleSelector = ({ doctorId, onContinue }) => {
   const [weekStart, setWeekStart] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [duration, setDuration] = useState(15);
   const [time, setTime] = useState(null);
   const [error, setError] = useState('');
+  const [slots, setSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const weekDays = getWeekDays(weekStart);
+
+  useEffect(() => {
+    if (!doctorId) return;
+    const fetchSlots = async () => {
+      setLoadingSlots(true);
+      setTime(null);
+      try {
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        const res = await fetch(
+          `${API_BASE_URL}/doctors/${doctorId}/availability?date=${dateStr}&duration=${duration}`,
+          { credentials: 'include' }
+        );
+        const data = await res.json();
+        setSlots(data.availableSlots || []);
+      } catch (err) {
+        console.error(err);
+        setSlots([]);
+      } finally {
+        setLoadingSlots(false);
+      }
+    };
+    fetchSlots();
+  }, [doctorId, selectedDate, duration]);
 
   const shiftWeek = (dir) => {
     const newStart = new Date(weekStart);
@@ -38,13 +62,13 @@ const ScheduleSelector = ({ onContinue }) => {
 
   const handleContinue = () => {
     if (!time) {
-      setError('Pehle ek time slot select karein');
+      setError('Please Select a Time zone');
       return;
     }
     setError('');
-    const [h, m] = time.split(':');
+    const time24 = time.split(' - ')[0];
     const fullDate = selectedDate.toISOString().split('T')[0];
-    onContinue({ date: selectedDate.getDate(), fullDate, time24: `${h}:${m}`, time, duration });
+    onContinue({ date: selectedDate.getDate(), fullDate, time24, time, duration });
   };
 
   return (
@@ -95,17 +119,23 @@ const ScheduleSelector = ({ onContinue }) => {
 
       <div>
         <p className="text-sm font-semibold text-gray-800 mb-2">Session Time</p>
-        <div className="grid grid-cols-4 gap-2">
-          {TIME_SLOTS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTime(t)}
-              className={`text-[11px] py-2 rounded-lg font-medium ${time === t ? 'bg-emerald-500 text-white' : 'bg-gray-50 text-gray-600'}`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        {loadingSlots ? (
+          <p className="text-xs text-gray-400">Loading available slots...</p>
+        ) : slots.length > 0 ? (
+          <div className="grid grid-cols-4 gap-2">
+            {slots.map((slot) => (
+              <button
+                key={slot}
+                onClick={() => setTime(slot)}
+                className={`text-[11px] py-2 rounded-lg font-medium ${time === slot ? 'bg-emerald-500 text-white' : 'bg-gray-50 text-gray-600'}`}
+              >
+                {slot.split(' - ')[0]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400">No slots available for this day</p>
+        )}
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}

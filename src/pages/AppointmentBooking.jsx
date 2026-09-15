@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDoctorById } from '../hooks/useDoctors';
 import { useBookingFlow, BOOKING_STEPS } from '../hooks/useBookingFlow';
+import { API_BASE_URL } from '../config/api';
 import ScheduleSelector from '../components/appointment/ScheduleSelector';
 import OrderSummary from '../components/appointment/OrderSummary';
 import PaymentForm from '../components/appointment/PaymentForm';
@@ -11,6 +13,7 @@ const AppointmentBooking = () => {
   const navigate = useNavigate();
   const { doctor, loading, error } = useDoctorById(doctorId);
   const { step, bookingDetails, goToOrderSummary, goToPayment, goBackToSchedule, goToWaiting } = useBookingFlow();
+  const [bookingError, setBookingError] = useState('');
 
   if (loading) return <div className="p-6 text-sm text-gray-400">Loading doctor...</div>;
 
@@ -25,8 +28,31 @@ const AppointmentBooking = () => {
     );
   }
 
-  // Yahan service ki jagah ab doctor ki consultation fee use hogi
-  const service = { title: `Consultation with ${doctor.name}`, price: doctor.consultationFee || 150 };
+  const service = { title: `Consultation with ${doctor.name}`, price: doctor.consultationFee || 500 };
+
+  const handlePaymentComplete = async (paymentDetails) => {
+    setBookingError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          doctorId: doctor.id,
+          date: bookingDetails.fullDate,
+          startTime: bookingDetails.time24,
+          durationMinutes: bookingDetails.duration,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Booking failed');
+
+      goToWaiting(paymentDetails);
+    } catch (err) {
+      setBookingError(err.message);
+    }
+  };
 
   const appointmentDateTime = bookingDetails
     ? `${bookingDetails.fullDate}T${bookingDetails.time24}:00`
@@ -64,7 +90,7 @@ const AppointmentBooking = () => {
               <p className="text-xs text-gray-400 mb-4">
                 Select a day and time that best fits your schedule. Your session will be private, secure, and last about 60 minutes.
               </p>
-              <ScheduleSelector onContinue={goToOrderSummary} />
+              <ScheduleSelector doctorId={doctor.id} onContinue={goToOrderSummary} />
             </>
           )}
 
@@ -73,7 +99,10 @@ const AppointmentBooking = () => {
           )}
 
           {step === BOOKING_STEPS.PAYMENT && (
-            <PaymentForm onPay={goToWaiting} onChangeTime={goBackToSchedule} />
+            <>
+              <PaymentForm onPay={handlePaymentComplete} onChangeTime={goBackToSchedule} />
+              {bookingError && <p className="text-xs text-red-500 mt-3">{bookingError}</p>}
+            </>
           )}
 
           {step === BOOKING_STEPS.WAITING && (

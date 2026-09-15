@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useServicesWithDoctors } from '../hooks/useServicesWithDoctors';
 import { useDoctorContext } from '../context/DoctorContext';
-import { useParams } from 'react-router-dom';
+import { getDoctorAvatar } from '../utils/doctorAvatarFallback';
 
 const ServiceDetails = () => {
   const { slug } = useParams();
@@ -31,7 +31,12 @@ const ServiceDetails = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="rounded-2xl overflow-hidden relative h-96">
-          <img src={doctor.avatar} alt={doctor.name} className="w-full h-full object-cover" style={{ objectPosition: 'center 20%' }} />
+          <img
+            src={getDoctorAvatar(doctor)}
+            alt={doctor.name}
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center 20%' }}
+          />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
             <h3 className="text-white font-bold">{doctor.name}</h3>
             <p className="text-white/80 text-xs">{doctor.bio}</p>

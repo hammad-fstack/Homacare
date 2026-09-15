@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://6a953957fa33b37f821a6898.mockapi.io/'
+export const API_BASE_URL = 'http://localhost:5000/api';

@@ -145,5 +145,34 @@ const verifyOtp = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+// GET /api/auth/me — check if currently logged in (used by frontend on app load)
+const getMe = async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      `SELECT u.id, u.email, u.role,
+              COALESCE(p.name, d.name) AS name,
+              COALESCE(p.avatar, d.avatar) AS avatar
+       FROM users u
+       LEFT JOIN patients p ON p.user_id = u.id
+       LEFT JOIN doctors d ON d.user_id = u.id
+       WHERE u.id = $1`,
+      [req.user.userId]
+    );
 
-module.exports = { signup, login, verifyOtp };
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ user: userResult.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const logout = (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Logged out successfully' });
+};
+
+module.exports = { signup, login, verifyOtp, getMe, logout };

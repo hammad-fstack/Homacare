@@ -1,3 +1,5 @@
+import { getDoctorAvatar } from '../../utils/doctorAvatarFallback';
+
 const DoctorGridCard = ({ doctor, isSelected, onSelect }) => (
   <div
     className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition bg-gray-100 ${
@@ -6,7 +8,7 @@ const DoctorGridCard = ({ doctor, isSelected, onSelect }) => (
     onClick={() => onSelect(doctor.id)}
   >
     <img
-      src={doctor.avatar}
+      src={getDoctorAvatar(doctor)}
       alt={doctor.name}
       className="w-full h-32 object-cover"
       style={{ objectPosition: 'center 20%' }}

@@ -10,9 +10,9 @@ const SymptomQuestionnaire = () => {
   if (!selectedDoctor) {
     return (
       <div className="p-6 text-center space-y-3">
-        <p className="text-sm text-gray-400">Pehle ek doctor select karein</p>
+        <p className="text-sm text-gray-400">Please Select a doctor First </p>
         <button onClick={() => navigate('/doctor-portal')} className="text-emerald-600 text-sm font-medium underline">
-          Doctors dekhein
+          Check Doctors
         </button>
       </div>
     );
