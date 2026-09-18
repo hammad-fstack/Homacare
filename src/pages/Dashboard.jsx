@@ -1,4 +1,4 @@
-import { Search, Bell, Globe } from 'lucide-react';
+import { Search, Globe } from 'lucide-react';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { METRIC_CARDS, EMPTY_STATE_CONFIG } from '../config/dashboardConfig';
 import MetricCard from '../components/common/MetricCard';
@@ -6,6 +6,7 @@ import ConsultationsSection from '../components/dashboard/ConsultationsSection';
 import LabTestsSection from '../components/dashboard/LabTestsSection';
 import CalendarWidget from '../components/dashboard/CalendarWidget';
 import ActivityFeed from '../components/dashboard/ActivityFeed';
+import NotificationBell from '../components/common/NotificationBell';
 
 const Dashboard = () => {
   const { data, loading } = useDashboardData('current-user-id');
@@ -26,14 +27,7 @@ const Dashboard = () => {
           <button className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
             <Globe className="w-4 h-4 text-gray-600" />
           </button>
-          <button className="relative w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-            <Bell className="w-4 h-4 text-gray-600" />
-            {data.notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
-                {data.notificationCount > 9 ? '9+' : data.notificationCount}
-              </span>
-            )}
-          </button>
+          <NotificationBell role="patient" />
         </div>
       </div>
 

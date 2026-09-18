@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { PhoneOff, Phone } from 'lucide-react';
-import DailyIframe from '@daily-co/daily-js';
+import { PhoneOff, Phone, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import { useConsultationMessages } from '../../hooks/useConsultationMessages';
+import { useWebRTC } from '../../hooks/useWebRTC';
 import { useCallSession } from '../../hooks/useCallSession';
 
 const ROLE_TABS = {
@@ -14,52 +14,58 @@ const ConsultationRoom = ({ appointment, role, patientInitial }) => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const { messages, sendMessage } = useConsultationMessages(appointment.id, role);
   const [messageText, setMessageText] = useState('');
-  const { callActive, roomUrl, startCall, endCall } = useCallSession(appointment.id);
-  const videoContainerRef = useRef(null);
-  const callFrameRef = useRef(null);
+
+  const {
+    localStream, remoteStream, connected, micOn, cameraOn,
+    startCall, leaveCall, toggleMic, toggleCamera,
+  } = useWebRTC(appointment.id, role);
+
+  const { notifyCallStart, notifyCallEnd } = useCallSession(appointment.id);
+
+  const [callStarted, setCallStarted] = useState(false);
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
 
   useEffect(() => {
-    if (callActive && roomUrl && videoContainerRef.current && !callFrameRef.current) {
-      const frame = DailyIframe.createFrame(videoContainerRef.current, {
-        iframeStyle: { width: '100%', height: '100%', border: '0', borderRadius: '16px' },
-        showLeaveButton: false,
-      });
-      frame.join({ url: roomUrl });
-      callFrameRef.current = frame;
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
     }
-    if (!callActive && callFrameRef.current) {
-      callFrameRef.current.destroy();
-      callFrameRef.current = null;
+  }, [localStream]);
+
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
     }
-    return () => {
-      if (callFrameRef.current) {
-        callFrameRef.current.destroy();
-        callFrameRef.current = null;
-      }
-    };
-  }, [callActive, roomUrl]);
+  }, [remoteStream]);
 
   const handleSend = () => {
     sendMessage(messageText);
     setMessageText('');
   };
 
-  const handleLeaveCall = async () => {
-    if (callFrameRef.current) callFrameRef.current.leave();
-    await endCall();
+  const handleStart = async () => {
+    setCallStarted(true);
+    await startCall();
+    await notifyCallStart();
+  };
+
+  const handleLeave = () => {
+    leaveCall();
+    notifyCallEnd();
+    setCallStarted(false);
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 h-[calc(100vh-140px)]">
       <div className="relative bg-gray-300 rounded-2xl overflow-hidden flex flex-col items-center justify-center">
-        {!callActive ? (
+        {!callStarted ? (
           <div className="text-center space-y-4">
             <div className="w-32 h-32 rounded-full bg-gray-400 flex items-center justify-center text-white text-4xl font-semibold mx-auto">
               {patientInitial}
             </div>
             <p className="text-gray-700 text-sm font-medium">Ready to start your consultation?</p>
             <button
-              onClick={startCall}
+              onClick={handleStart}
               className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
             >
               <Phone className="w-4 h-4" /> Join Call
@@ -67,13 +73,38 @@ const ConsultationRoom = ({ appointment, role, patientInitial }) => {
           </div>
         ) : (
           <>
-            <div ref={videoContainerRef} className="w-full h-full" />
-            <button
-              onClick={handleLeaveCall}
-              className="absolute bottom-4 w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center text-white"
-            >
-              <PhoneOff className="w-5 h-5" />
-            </button>
+            {/* Remote video — poori jagah fill karta hai */}
+            {remoteStream ? (
+              <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+            ) : (
+              <div className="text-center">
+                <div className="w-32 h-32 rounded-full bg-gray-400 flex items-center justify-center text-white text-4xl font-semibold mx-auto">
+                  {patientInitial}
+                </div>
+                <p className="text-white/90 text-sm font-medium mt-4">
+                  Please wait, while your {role === 'doctor' ? 'patient' : 'doctor'} is joining...
+                </p>
+              </div>
+            )}
+
+            {/* Local video — chhota preview corner mein */}
+            <div className="absolute bottom-24 right-4 w-32 h-24 rounded-xl overflow-hidden border-2 border-white bg-gray-500">
+              <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+              <div className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">You</div>
+            </div>
+
+            {/* Controls */}
+            <div className="absolute bottom-4 bg-black/40 rounded-full px-3 py-2 flex items-center gap-2">
+              <button onClick={toggleMic} className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white">
+                {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+              </button>
+              <button onClick={toggleCamera} className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white">
+                {cameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
+              </button>
+              <button onClick={handleLeave} className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center text-white">
+                <PhoneOff className="w-4 h-4" />
+              </button>
+            </div>
           </>
         )}
       </div>

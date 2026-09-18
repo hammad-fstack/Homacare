@@ -1,7 +1,9 @@
+import { Search, Globe } from 'lucide-react';
 import { useDoctorDashboard } from '../../hooks/useDoctorDashboard';
 import { DOCTOR_METRIC_CARDS } from '../../config/doctorDashboardConfig';
 import MetricCard from '../../components/common/MetricCard';
 import CalendarWidget from '../../components/dashboard/CalendarWidget';
+import NotificationBell from '../../components/common/NotificationBell';
 import { ChevronRight } from 'lucide-react';
 
 const DoctorDashboard = () => {
@@ -11,7 +13,20 @@ const DoctorDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <input type="text" placeholder="Search"
+              className="bg-gray-100 text-gray-600 text-xs rounded-lg pl-3 pr-8 py-2 w-48 outline-none placeholder-gray-400" />
+            <Search className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
+          </div>
+          <button className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
+            <Globe className="w-4 h-4 text-gray-600" />
+          </button>
+          <NotificationBell role="doctor" />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BACKEND_URL } from '../config/backendApi';
+import { API_BASE_URL } from '../config/api';
 
 export const useAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -9,7 +9,7 @@ export const useAppointments = () => {
     const fetchAppointments = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/appointments/my`, { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/appointments/my`, { credentials: 'include' });
         const data = await res.json();
         setAppointments(data.appointments || []);
       } catch (err) {

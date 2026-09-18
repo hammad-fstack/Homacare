@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { createNotification } = require('./notificationController');
 
 const timeToMinutes = (time) => {
     const [h, m] = time.split(':').map(Number);
@@ -19,11 +20,12 @@ const createAppointment = async (req, res) => {
         }
         const patientId = patientResult.rows[0].id;
 
-        const doctorResult = await pool.query('SELECT consultation_fee FROM doctors WHERE id = $1', [doctorId]);
+        const doctorResult = await pool.query('SELECT consultation_fee, user_id FROM doctors WHERE id = $1', [doctorId]);
         if (doctorResult.rows.length === 0) {
             return res.status(404).json({ error: 'Doctor not found' });
         }
         const price = doctorResult.rows[0].consultation_fee;
+        const doctorUserId = doctorResult.rows[0].user_id;
 
         const startMinutes = timeToMinutes(startTime);
         const endMinutes = startMinutes + parseInt(durationMinutes, 10);
@@ -46,7 +48,27 @@ const createAppointment = async (req, res) => {
             [patientId, doctorId, date, startTime, endTime, durationMinutes, price]
         );
 
-        res.status(201).json({ message: 'Appointment booked successfully', appointmentId: insertResult.rows[0].id });
+        const newAppointmentId = insertResult.rows[0].id;
+
+        // Patient ko confirmation notification
+        await createNotification(
+            req.user.userId,
+            'appointment_confirmed',
+            'Appointment Confirmed',
+            `Your consultation on ${date} at ${startTime} is confirmed.`,
+            newAppointmentId
+        );
+
+        // Doctor ko naye booking ki khabar
+        await createNotification(
+            doctorUserId,
+            'new_booking',
+            'New Appointment Booked',
+            `A patient booked a consultation on ${date} at ${startTime}.`,
+            newAppointmentId
+        );
+
+        res.status(201).json({ message: 'Appointment booked successfully', appointmentId: newAppointmentId });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error' });

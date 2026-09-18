@@ -13,7 +13,7 @@ const getTimeLeft = (targetDate) => {
 
 // Encapsulation — countdown logic asal appointment date se calculate hoti hai,
 // koi hardcoded value nahi
-const WaitingScreen = ({ appointmentDateTime }) => {
+const WaitingScreen = ({ appointmentDateTime, appointmentId, role }) => {
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(appointmentDateTime));
 
   useEffect(() => {
@@ -28,9 +28,8 @@ const WaitingScreen = ({ appointmentDateTime }) => {
         {timeLeft.expired ? "It's time!" : `${timeLeft.h}h ${timeLeft.m}m ${timeLeft.s}s`}
       </p>
       <button disabled={!timeLeft.expired}
-        className={`text-sm font-medium px-6 py-2.5 rounded-lg text-white ${
-          timeLeft.expired ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gray-300 cursor-not-allowed'
-        }`}>
+        className={`text-sm font-medium px-6 py-2.5 rounded-lg text-white ${timeLeft.expired ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gray-300 cursor-not-allowed'
+          }`}>
         Start Now
       </button>
       <button className="text-xs text-red-500 hover:underline">Cancel Consultation</button>

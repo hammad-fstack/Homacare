@@ -3,14 +3,12 @@ import { API_BASE_URL } from '../config/api';
 
 export const useCallSession = (appointmentId) => {
     const [callActive, setCallActive] = useState(false);
-    const [roomUrl, setRoomUrl] = useState(null);
 
     const checkStatus = useCallback(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/calls/${appointmentId}/status`, { credentials: 'include' });
             const data = await res.json();
             setCallActive(data.active || false);
-            setRoomUrl(data.roomUrl || null);
         } catch (err) {
             console.error(err);
         }
@@ -22,18 +20,15 @@ export const useCallSession = (appointmentId) => {
         return () => clearInterval(interval);
     }, [checkStatus]);
 
-    const startCall = async () => {
-        const res = await fetch(`${API_BASE_URL}/calls/${appointmentId}/start`, { method: 'POST', credentials: 'include' });
-        const data = await res.json();
-        setRoomUrl(data.roomUrl);
+    const notifyCallStart = async () => {
+        await fetch(`${API_BASE_URL}/calls/${appointmentId}/start`, { method: 'POST', credentials: 'include' });
         setCallActive(true);
-        return data.roomUrl;
     };
 
-    const endCall = async () => {
+    const notifyCallEnd = async () => {
         await fetch(`${API_BASE_URL}/calls/${appointmentId}/end`, { method: 'POST', credentials: 'include' });
         setCallActive(false);
     };
 
-    return { callActive, roomUrl, startCall, endCall };
+    return { callActive, notifyCallStart, notifyCallEnd };
 };

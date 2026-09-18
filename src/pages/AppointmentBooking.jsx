@@ -106,7 +106,8 @@ const AppointmentBooking = () => {
           )}
 
           {step === BOOKING_STEPS.WAITING && (
-            <WaitingScreen appointmentDateTime={appointmentDateTime} />
+            <WaitingScreen appointmentDateTime={appointmentDateTime}
+              appointmentId={doctor.id ? bookingDetails?.appointmentId : null} role="patient" />
           )}
         </div>
       </div>

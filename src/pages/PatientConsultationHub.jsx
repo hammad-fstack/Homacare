@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Globe } from 'lucide-react';
+import { Search, Globe } from 'lucide-react';
 import { useAppointments } from '../hooks/useAppointments';
 import SimpleChatThread from '../components/consultations/SimpleChatThread';
+import NotificationBell from '../components/common/NotificationBell';
 
 const TABS = ['Chat', 'Prescriptions', 'Lab Tests'];
 
@@ -29,7 +30,7 @@ const PatientConsultationHub = () => {
                         <Search className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
                     </div>
                     <button className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"><Globe className="w-4 h-4 text-gray-600" /></button>
-                    <button className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"><Bell className="w-4 h-4 text-gray-600" /></button>
+                    <NotificationBell role="patient" />
                 </div>
             </div>
 

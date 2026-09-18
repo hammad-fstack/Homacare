@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BACKEND_URL } from '../config/backendApi';
+import { API_BASE_URL } from '../config/api';
 
 export const useDashboardData = (userId) => {
   const [data, setData] = useState(null);
@@ -9,7 +9,7 @@ export const useDashboardData = (userId) => {
     const fetchDashboard = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/appointments/my`, { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/appointments/my`, { credentials: 'include' });
         const result = await res.json();
         const appointments = result.appointments || [];
 

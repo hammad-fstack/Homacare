@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Search, Settings, Filter, Calendar, Globe, Bell } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Settings, Filter, Calendar, Globe } from 'lucide-react';
 import { useDoctorAppointments } from '../../hooks/useDoctorAppointments';
 import ScheduleSettingsModal from '../../components/doctor/ScheduleSettingsModal';
 import { isJoinable } from '../../utils/consultationTiming';
+import NotificationBell from '../../components/common/NotificationBell';
 
 const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -45,8 +46,6 @@ const DoctorAppointments = () => {
     return sameMonth && (search === '' || matchesSearch);
   });
 
-  const notificationCount = appointments.filter((a) => a.status === 'scheduled').length;
-
   if (loading) return <div className="p-6 text-sm text-gray-400">Loading...</div>;
 
   return (
@@ -62,18 +61,10 @@ const DoctorAppointments = () => {
           <button className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
             <Globe className="w-4 h-4 text-gray-600" />
           </button>
-          <button className="relative w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-            <Bell className="w-4 h-4 text-gray-600" />
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
-                {notificationCount > 9 ? '9+' : notificationCount}
-              </span>
-            )}
-          </button>
+          <NotificationBell role="doctor" />
         </div>
       </div>
 
-      {/* Single card: month-nav bar + table */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm">
         <div className="flex flex-wrap justify-between items-center gap-3 p-5 border-b border-gray-100">
           <div className="flex items-center gap-2">
@@ -142,7 +133,7 @@ const DoctorAppointments = () => {
                     <td className="py-4 px-5">
                       {appt.status === 'scheduled' && isJoinable(appt) ? (
                         <button
-                          onClick={() =>navigate('/doctor/consultation-hub')}
+                          onClick={() => navigate('/doctor/consultation-hub')}
                           className="text-emerald-600 font-medium"
                         >
                           Join &gt;

@@ -10,22 +10,22 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
 });
 
-// Testing ke liye sab doctors ka same password — baad mein badal sakte ho
+// Testing ke liye sab doctors ka same password — baad mein badal sakte hain
 const DEFAULT_PASSWORD = 'Doctor123!';
 
 const DOCTORS = [
-  { email: 'dr.hassan@homacare.test', name: 'Dr. Hassan', specialty: 'Fertility Specialist', experience: '8 years', bio: 'Fertility aur reproductive health mein specialist.', fee: 150 },
-  { email: 'dr.ayesha@homacare.test', name: 'Dr. Ayesha Khan', specialty: 'Gynecologist', experience: '10 years', bio: 'Women\'s health aur hormonal balance expert.', fee: 180 },
-  { email: 'dr.waizz@homacare.test', name: 'Dr. Waizz', specialty: 'Cardiology', experience: '6 years', bio: 'Cardiology mein years of experience providing excellent care.', fee: 200 },
-  { email: 'dr.faheem@homacare.test', name: 'Dr. Faheem Ahmad', specialty: 'Neurosurgeon', experience: '12 years', bio: 'Neurosurgery aur brain health specialist.', fee: 250 },
-  { email: 'dr.wasif@homacare.test', name: 'Dr. Wasif', specialty: 'Physiotherapist', experience: '5 years', bio: 'Physical therapy aur recovery specialist.', fee: 120 },
-  { email: 'dr.farha@homacare.test', name: 'Dr. Farha Ali', specialty: 'Hormone Specialist', experience: '9 years', bio: 'Hormonal balance aur endocrinology expert.', fee: 160 },
-  { email: 'dr.layla@homacare.test', name: 'Dr. Layla Hassan', specialty: 'Fertility & Hormone Specialist', experience: '7 years', bio: 'Fertility panel testing aur hormone health specialist.', fee: 170 },
-  { email: 'dr.ahmad@homacare.test', name: 'Dr. Ahmad Mansoor', specialty: 'Urologist', experience: '11 years', bio: 'Sexual wellness aur urology specialist.', fee: 190 },
-  { email: 'dr.sara@homacare.test', name: 'Dr. Sara Malik', specialty: 'Psychiatrist', experience: '8 years', bio: 'Mental health aur stress management specialist.', fee: 175 },
-  { email: 'dr.usman@homacare.test', name: 'Dr. Usman Tariq', specialty: 'General Physician', experience: '15 years', bio: 'General health checkups aur consultations.', fee: 100 },
-  { email: 'dr.zainab@homacare.test', name: 'Dr. Zainab Rehman', specialty: 'Obstetrician', experience: '10 years', bio: 'Pregnancy aur maternal health specialist.', fee: 210 },
-  { email: 'dr.bilal@homacare.test', name: 'Dr. Bilal Sheikh', specialty: 'Counselor', experience: '6 years', bio: 'Talk therapy aur counseling specialist.', fee: 140 },
+  { email: 'dr.hassan@homacare.test', name: 'Dr. Hassan', specialty: 'Fertility Specialist', experience: '8 years', bio: 'Fertility and reproductive health Specialist.', fee: 150 },
+  { email: 'dr.ayesha@homacare.test', name: 'Dr. Ayesha Khan', specialty: 'Gynecologist', experience: '10 years', bio: 'Women\'s health and hormonal balance expert.', fee: 180 },
+  { email: 'dr.waizz@homacare.test', name: 'Dr. Waizz', specialty: 'Cardiology', experience: '6 years', bio: 'Cardiology, years of experience providing excellent care.', fee: 200 },
+  { email: 'dr.faheem@homacare.test', name: 'Dr. Faheem Ahmad', specialty: 'Neurosurgeon', experience: '12 years', bio: 'Neurosurgery and brain health specialist.', fee: 250 },
+  { email: 'dr.wasif@homacare.test', name: 'Dr. Wasif', specialty: 'Physiotherapist', experience: '5 years', bio: 'Physical therapy and recovery specialist.', fee: 120 },
+  { email: 'dr.farha@homacare.test', name: 'Dr. Farha Ali', specialty: 'Hormone Specialist', experience: '9 years', bio: 'Hormonal balance and endocrinology expert.', fee: 160 },
+  { email: 'dr.layla@homacare.test', name: 'Dr. Layla Hassan', specialty: 'Fertility & Hormone Specialist', experience: '7 years', bio: 'Fertility panel testing and hormone health specialist.', fee: 170 },
+  { email: 'dr.ahmad@homacare.test', name: 'Dr. Ahmad Mansoor', specialty: 'Urologist', experience: '11 years', bio: 'Sexual wellness and urology specialist.', fee: 190 },
+  { email: 'dr.sara@homacare.test', name: 'Dr. Sara Malik', specialty: 'Psychiatrist', experience: '8 years', bio: 'Mental health and stress management specialist.', fee: 175 },
+  { email: 'dr.usman@homacare.test', name: 'Dr. Usman Tariq', specialty: 'General Physician', experience: '15 years', bio: 'General health checkups and consultations.', fee: 100 },
+  { email: 'dr.zainab@homacare.test', name: 'Dr. Zainab Rehman', specialty: 'Obstetrician', experience: '10 years', bio: 'Pregnancy and  maternal health specialist.', fee: 210 },
+  { email: 'dr.bilal@homacare.test', name: 'Dr. Bilal Sheikh', specialty: 'Counselor', experience: '6 years', bio: 'Talk therapy and counseling specialist.', fee: 140 },
 ];
 
 const seed = async () => {
